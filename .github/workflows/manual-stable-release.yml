@@ -2,10 +2,9 @@ name: Manual Stable Release
 
 on:
   workflow_dispatch:
-    inputs:
-      version_tag:
-        description: 'Input version tag exactly (e.g. 26.03 or 26.03.01)'
-        required: true
+
+env:
+  UPSTREAM_REPO: "https://github.com/wxxsfxyzm/InstallerX-Revived"
 
 jobs:
   build_and_release:
@@ -60,6 +59,14 @@ jobs:
           echo "keyPassword=${SIGNING_KEY_PASSWORD}" >> keystore.properties
           echo "storePassword=${SIGNING_STORE_PASSWORD}" >> keystore.properties
 
+      - name: Calculate Version and Time
+        id: meta
+        run: |
+          UPSTREAM_SHA=$(git ls-remote "$UPSTREAM_REPO" HEAD | awk '{print $1}' | cut -c1-7)
+          DATE_VER=$(date +'%y.%m')
+          FINAL_VERSION="${DATE_VER}.${UPSTREAM_SHA}"
+          echo "NEW_VERSION=$FINAL_VERSION" >> $GITHUB_ENV
+
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
@@ -68,13 +75,13 @@ jobs:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # Explicitly pass the user input to override the dynamic date version in Gradle
-        run: ./gradlew assembleOnlineStableRelease -PVERSION_NAME="${{ inputs.version_tag }}" -PAPP_ID=com.android.packageinstaller
+        run: ./gradlew assembleOnlineStableRelease -PVERSION_NAME="${{ env.NEW_VERSION }}" -PAPP_ID=com.android.packageinstaller
 
       - name: Find and Rename Universal APKs
         id: rename_apk
         run: |
           PROJECT_NAME="InstallerX-Revived"
-          VERSION_TAG="${{ inputs.version_tag }}"
+          VERSION_TAG="${{ env.NEW_VERSION }}"
           
           for FLAVOR in online; do
             APK_DIR="app/build/outputs/apk/${FLAVOR}Stable/release/"
