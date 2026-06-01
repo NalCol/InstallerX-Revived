@@ -108,9 +108,10 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          name: "InstallerX Revived stable ${{ env.NEW_VERSION }}"
+          name: "InstallerX Revived unstable ${{ env.NEW_VERSION }}"
           # Use the exact input as the tag name
           tag_name: ${{ env.NEW_VERSION }}
+          body: "Package name: com.android.packageinstaller \n Online variant only"
           # Publish as draft so you can manually write the changelog and publish it later
           draft: true
           prerelease: false
