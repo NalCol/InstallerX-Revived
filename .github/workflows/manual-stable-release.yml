@@ -5,6 +5,7 @@ on:
 
 env:
   UPSTREAM_REPO: "https://github.com/wxxsfxyzm/InstallerX-Revived"
+  NEW_VERSION: ""
 
 jobs:
   build_and_release:
@@ -112,4 +113,4 @@ jobs:
           # Explicitly prevent GitHub from auto-generating release notes in the body
           generate_release_notes: false
           files: |
-            app/build/outputs/apk/onlineStable/release/InstallerX-Revived-online-${{ inputs.version_tag }}.apk
+            app/build/outputs/apk/onlineStable/release/InstallerX-Revived-online-${{ env.NEW_VERSION }}.apk
